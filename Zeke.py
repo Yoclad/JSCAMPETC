@@ -1,25 +1,21 @@
 # Zeke
 
-
-import FixedTradeGetter
-from FixedTradeGetter import *
 import time
 
 
 class Trader:
 
-    def __init__(self, flux_range, past_trade_feed, symbol, correction_rate):
-        self.fair_price_est = fair_price_est
+    def __init__(self, flux_range, past_trade_feed, symbol, correction_rate, trade_list):
         self.past_trade_feed = past_trade_feed
         self.correction_rate = correction_rate
-        self.position = position
         self.symbol = symbol
+        self.trade_list = trade_list
         self.flux_range = flux_range
 
     def correction_rate_finder(self):
         self.past_trade_feed = 5
 
-        trade_list = FixedTradeGetter.getListValues(self.symbol, self.past_trade_feed)
+        trade_list = self.trade_list
         base_trade = 1
         negs = [], False
         pos = [], True
@@ -44,18 +40,18 @@ class Trader:
 
     def fair_price_finder(self):
 
-        trade_list = (FixedTradeGetter.getListValues(symbol, self.past_trade_feed))
-        last_trade = trade_list[(len(FixedTradeGetter.getListValues(self.symbol, self.past_trade_feed))) - 1]
+        trade_list = self.trade_list
+        last_trade = trade_list[len(trade_list) - 1]
 
-        self.fair_price_est = last_trade + self.correction_rate
-        return self.fair_price_est
+        fair_price_est = last_trade + self.correction_rate
+        return fair_price_est
 
     def position_range(self, fair_price_est):
         upper = fair_price_est + self.flux_range
         lower = fair_price_est - self.flux_range
 
-        self.position = [lower, upper]
-        return self.position
+        position = [lower, upper]
+        return position
 
     def make_trades(self):
         while self.correction_rate_finder() > self.flux_range:
@@ -66,8 +62,8 @@ class Trader:
         return sell, buy
 
 
-def main(flux_range, past_trade_feed, symbol, correction_rate):
-    trader = Trader(flux_range, past_trade_feed, symbol, correction_rate)
+def main(flux_range, past_trade_feed, symbol, correction_rate, trade_list):
+    trader = Trader(flux_range, past_trade_feed, symbol, correction_rate, trade_list)
     sell_position = trader.make_trades()[0]
     buy_position = trader.make_trades()[1]
     return sell_position, buy_position

@@ -11,10 +11,7 @@ import time
 import socket
 import json
 
-import Zeke
 from Zeke import *
-from FixedTradeGetter import *
-from SellOff import *
 
 # ~~~~~============== CONFIGURATION  ==============~~~~~
 # Replace "REPLACEME" with your team name!
@@ -68,10 +65,22 @@ def main():
     # message. Sending a message in response to every exchange message will
     # cause a feedback loop where your bot's messages will quickly be
     # rate-limited and ignored. Please, don't do that!
+    def listmaker(list, number):
+        if len(list) < number:
+            return list
+        else:
+            returnList = []
+            for x in range(0, number):
+                returnList.add(list[len(list) - x])
+
+            return returnList
+
     while True:
         # All exchange information comes from this method
         message = exchange.read_message()
 
+        # Creates empty list
+        mslist, bondlist, gslist, valbzlist, valelist, wfclist, xlflist = [], [], [], [], [], [], []
         # Some of the message types below happen infrequently and contain
         # important information to help you understand what your bot is doing,
         # so they are printed in full. We recommend not always printing every
@@ -87,69 +96,79 @@ def main():
             print(message)
         elif message["type"] == "fill":
             print(message)
-        elif message["type"] == "book":
-            if message["symbol"] == "VALE":
+        elif message["type"] == "trade":
+            if (message["symbol"]) == "MS" and len(mslist)<=2:
+                mslist.append(message["price"])
+                print("mslist")
 
-                def best_price(side):
-                    if message[side]:
-                        return message[side][0][0]
+            elif (message["symbol"]) == "BOND" and len(bondlist)<=2:
+                bondlist.append(message["price"])
+                print("bondlist")
 
-                vale_bid_price = best_price("buy")
-                vale_ask_price = best_price("sell")
+            elif (message["symbol"]) == "GS" and len(gslist)<=2:
+                gslist.append(message["price"])
+                print("gslist")
 
-                now = time.time()
+            elif (message["symbol"]) == "VALBZ" and len(valbzlist)<=2:
+                valbzlist.append(message["price"])
+                print("valbzlist")
 
-                if now > vale_last_print_time + 1:
-                    vale_last_print_time = now
-                    print(
-                        {
-                            "vale_bid_price": vale_bid_price,
-                            "vale_ask_price": vale_ask_price,
-                        }
-                    )
+            elif (message["symbol"]) == "VALE" and len(valelist)<=2:
+                valelist.append(message["price"])
+                print("valelist")
+
+            elif (message["symbol"]) == "WFC" and len(wfclist)<=2:
+                wfclist.append(message["price"])
+                print("wfclist")
+
+            elif (message["symbol"]) == "XLF" and len(xlflist)<=2:
+                xlflist.append(message["price"])
+                print("xlflist")
 
     # BOND
-    bond_zeke = Zeke.Trader(3, 5, "BOND", 5)
+    print("bond in")
+    bond_zeke = Trader(3, 5, "BOND", 5, listmaker(bondlist,5))
     bond_sale = int(bond_zeke[0])
     bond_purchase = int(bond_zeke[1])
     exchange.send_add_message(order_id=1, symbol="BOND", dir=Dir.BUY, price=bond_purchase, size=1)
     exchange.send_add_message(order_id=2, symbol="BOND", dir=Dir.SELL, price=bond_sale, size=1)
+    print("bond")
     # VALBZ
-    valbz_zeke = Zeke.Trader(5, 5, "VALBZ", 10)
+    valbz_zeke = Trader(5, 5, "VALBZ", 10, listmaker(gslist,5))
     valbz_sale = int(valbz_zeke[0])
     valbz_purchase = int(valbz_zeke[1])
-    exchange.send_add_message(order_id=3, symbol="BOND", dir=Dir.BUY, price=valbz_purchase, size=1)
-    exchange.send_add_message(order_id=4, symbol="BOND", dir=Dir.SELL, price=valbz_sale, size=1)
+    exchange.send_add_message(order_id=3, symbol="VALBZ", dir=Dir.BUY, price=valbz_purchase, size=1)
+    exchange.send_add_message(order_id=4, symbol="VALBZ", dir=Dir.SELL, price=valbz_sale, size=1)
     # VALE
-    vale_zeke = Zeke.Trader(5, 5, "VALE", 10)
+    vale_zeke = Trader(5, 5, "VALE", 10, listmaker(valelist,5))
     vale_sale = int(vale_zeke[0])
     vale_purchase = int(vale_zeke[1])
-    exchange.send_add_message(order_id=5, symbol="BOND", dir=Dir.BUY, price=vale_purchase, size=1)
-    exchange.send_add_message(order_id=6, symbol="BOND", dir=Dir.SELL, price=vale_sale, size=1)
+    exchange.send_add_message(order_id=5, symbol="VALE", dir=Dir.BUY, price=vale_purchase, size=1)
+    exchange.send_add_message(order_id=6, symbol="VALE", dir=Dir.SELL, price=vale_sale, size=1)
     # GS
-    gs_zeke = Zeke.Trader(5, 5, "GS", 10)
+    gs_zeke = Trader(5, 5, "GS", 10, listmaker(gslist,5))
     gs_sale = int(gs_zeke[0])
     gs_purchase = int(gs_zeke[1])
-    exchange.send_add_message(order_id=7, symbol="BOND", dir=Dir.BUY, price=gs_purchase, size=1)
-    exchange.send_add_message(order_id=8, symbol="BOND", dir=Dir.SELL, price=gs_sale, size=1)
+    exchange.send_add_message(order_id=7, symbol="GS", dir=Dir.BUY, price=gs_purchase, size=1)
+    exchange.send_add_message(order_id=8, symbol="GS", dir=Dir.SELL, price=gs_sale, size=1)
     # MS
-    ms_zeke = Zeke.Trader(5, 5, "MS", 10)
+    ms_zeke = Trader(5, 5, "MS", 10, listmaker(mslist,5))
     ms_sale = int(ms_zeke[0])
     ms_purchase = int(ms_zeke[1])
-    exchange.send_add_message(order_id=9, symbol="BOND", dir=Dir.BUY, price=ms_purchase, size=1)
-    exchange.send_add_message(order_id=10, symbol="BOND", dir=Dir.SELL, price=ms_sale, size=1)
+    exchange.send_add_message(order_id=9, symbol="MS", dir=Dir.BUY, price=ms_purchase, size=1)
+    exchange.send_add_message(order_id=10, symbol="MS", dir=Dir.SELL, price=ms_sale, size=1)
     # WFC
-    wfc_zeke = Zeke.Trader(5, 5, "WFC", 10)
+    wfc_zeke = Trader(5, 5, "WFC", 10, listmaker(wfclist,5))
     wfc_sale = int(wfc_zeke[0])
     wfc_purchase = int(wfc_zeke[1])
-    exchange.send_add_message(order_id=11, symbol="BOND", dir=Dir.BUY, price=wfc_purchase, size=1)
-    exchange.send_add_message(order_id=12, symbol="BOND", dir=Dir.SELL, price=wfc_sale, size=1)
+    exchange.send_add_message(order_id=11, symbol="WFC", dir=Dir.BUY, price=wfc_purchase, size=1)
+    exchange.send_add_message(order_id=12, symbol="WFC", dir=Dir.SELL, price=wfc_sale, size=1)
     # XLF
-    xlf_zeke = Zeke.Trader(5, 5, "XLF", 10)
+    xlf_zeke = Trader(5, 5, "XLF", 10, listmaker(xlflist,5))
     xlf_sale = int(xlf_zeke[0])
     xlf_purchase = int(xlf_zeke[1])
-    exchange.send_add_message(order_id=13, symbol="BOND", dir=Dir.BUY, price=xlf_sale, size=1)
-    exchange.send_add_message(order_id=14, symbol="BOND", dir=Dir.SELL, price=xlf_purchase, size=1)
+    exchange.send_add_message(order_id=13, symbol="XLF", dir=Dir.BUY, price=xlf_sale, size=1)
+    exchange.send_add_message(order_id=14, symbol="XLF", dir=Dir.SELL, price=xlf_purchase, size=1)
 
 # ~~~~~============== PROVIDED CODE ==============~~~~~
 
