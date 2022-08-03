@@ -11,6 +11,11 @@ import time
 import socket
 import json
 
+import Zeke
+from Zeke import *
+from FixedTradeGetter import *
+from SellOff import *
+
 # ~~~~~============== CONFIGURATION  ==============~~~~~
 # Replace "REPLACEME" with your team name!
 team_name = "ROCKFISH"
@@ -42,14 +47,14 @@ def main():
     # Send an order for BOND at a good price, but it is low enough that it is
     # unlikely it will be traded against. Maybe there is a better price to
     # pick? Also, you will need to send more orders over time.
-    exchange.send_add_message(order_id=1, symbol="BOND", dir=Dir.BUY, price=999, size=1)
-    exchange.send_add_message(order_id=1, symbol="BOND", dir=Dir.SELL, price=1002, size=1)
+    # exchange.send_add_message(order_id=1, symbol="BOND", dir=Dir.BUY, price=999, size=1)
+    # exchange.send_add_message(order_id=2, symbol="BOND", dir=Dir.SELL, price=1002, size=1)
 
     # Set up some variables to track the bid and ask price of a symbol. Right
     # now this doesn't track much information, but it's enough to get a sense
     # of the VALE market.
-    vale_bid_price, vale_ask_price = None, None
-    vale_last_print_time = time.time()
+    # vale_bid_price, vale_ask_price = None, None
+    # vale_last_print_time = time.time()
 
     # Here is the main loop of the program. It will continue to read and
     # process messages in a loop until a "close" message is received. You
@@ -103,6 +108,48 @@ def main():
                         }
                     )
 
+    # BOND
+    bond_zeke = Zeke.Trader(3, 5, "BOND", 5)
+    bond_sale = int(bond_zeke[0])
+    bond_purchase = int(bond_zeke[1])
+    exchange.send_add_message(order_id=1, symbol="BOND", dir=Dir.BUY, price=bond_purchase, size=1)
+    exchange.send_add_message(order_id=2, symbol="BOND", dir=Dir.SELL, price=bond_sale, size=1)
+    # VALBZ
+    valbz_zeke = Zeke.Trader(5, 5, "VALBZ", 10)
+    valbz_sale = int(valbz_zeke[0])
+    valbz_purchase = int(valbz_zeke[1])
+    exchange.send_add_message(order_id=3, symbol="BOND", dir=Dir.BUY, price=valbz_purchase, size=1)
+    exchange.send_add_message(order_id=4, symbol="BOND", dir=Dir.SELL, price=valbz_sale, size=1)
+    # VALE
+    vale_zeke = Zeke.Trader(5, 5, "VALE", 10)
+    vale_sale = int(vale_zeke[0])
+    vale_purchase = int(vale_zeke[1])
+    exchange.send_add_message(order_id=5, symbol="BOND", dir=Dir.BUY, price=vale_purchase, size=1)
+    exchange.send_add_message(order_id=6, symbol="BOND", dir=Dir.SELL, price=vale_sale, size=1)
+    # GS
+    gs_zeke = Zeke.Trader(5, 5, "GS", 10)
+    gs_sale = int(gs_zeke[0])
+    gs_purchase = int(gs_zeke[1])
+    exchange.send_add_message(order_id=7, symbol="BOND", dir=Dir.BUY, price=gs_purchase, size=1)
+    exchange.send_add_message(order_id=8, symbol="BOND", dir=Dir.SELL, price=gs_sale, size=1)
+    # MS
+    ms_zeke = Zeke.Trader(5, 5, "MS", 10)
+    ms_sale = int(ms_zeke[0])
+    ms_purchase = int(ms_zeke[1])
+    exchange.send_add_message(order_id=9, symbol="BOND", dir=Dir.BUY, price=ms_purchase, size=1)
+    exchange.send_add_message(order_id=10, symbol="BOND", dir=Dir.SELL, price=ms_sale, size=1)
+    # WFC
+    wfc_zeke = Zeke.Trader(5, 5, "WFC", 10)
+    wfc_sale = int(wfc_zeke[0])
+    wfc_purchase = int(wfc_zeke[1])
+    exchange.send_add_message(order_id=11, symbol="BOND", dir=Dir.BUY, price=wfc_purchase, size=1)
+    exchange.send_add_message(order_id=12, symbol="BOND", dir=Dir.SELL, price=wfc_sale, size=1)
+    # XLF
+    xlf_zeke = Zeke.Trader(5, 5, "XLF", 10)
+    xlf_sale = int(xlf_zeke[0])
+    xlf_purchase = int(xlf_zeke[1])
+    exchange.send_add_message(order_id=13, symbol="BOND", dir=Dir.BUY, price=xlf_sale, size=1)
+    exchange.send_add_message(order_id=14, symbol="BOND", dir=Dir.SELL, price=xlf_purchase, size=1)
 
 # ~~~~~============== PROVIDED CODE ==============~~~~~
 
